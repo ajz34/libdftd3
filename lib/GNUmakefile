@@ -30,7 +30,7 @@ $(LIBD3): $(OBJS)
 	ar r $@ $^
 
 $(LIBD3SO): $(OBJS)
-	$(FC) -shared -o $(LIBD3SO) $(OBJS) 
+	$(FC) -fPIC -shared -o $(LIBD3SO) $(OBJS)
 
 clean:
 	rm -f *.o
@@ -39,10 +39,10 @@ distclean: clean
 	rm -f *.mod $(LIBD3) $(LIBD3SO)
 
 %.o: %.f90
-	$(FC) $(FCFLAGS) -c $< -o $@
+	$(FC) -fPIC $(FCFLAGS) -c $< -o $@
 
 %.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) -fPIC $(CFLAGS) -c $< -o $@
 
 # Dependencies
 api.o: common.o core.o sizes.o
