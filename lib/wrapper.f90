@@ -47,3 +47,38 @@ subroutine wrapper(natoms, coords, itype, fun, version, tz, edisp, grads) bind(c
   call dftd3_dispersion(dftd3, coordsr, itype, edisp, grads)
 
 end subroutine wrapper
+
+subroutine wrapper_params(natoms, coords, itype, params, version, edisp, grads) bind(c)
+
+  use iso_c_binding, only: c_int, c_double, c_null_char, c_char
+  use dftd3_api, only: dftd3_calc, dftd3_input, dftd3_init, dftd3_dispersion, &
+                       dftd3_set_params
+  implicit none
+
+  integer(kind=c_int), intent(in), value :: natoms
+  real(kind=c_double) :: coords(natoms,3)
+  integer(kind=c_int), intent(in) :: itype(natoms)
+  real(kind=c_double), intent(in) :: params(5)
+  integer(kind=c_int), intent(in), value :: version
+  real(kind=c_double), intent(out) :: edisp
+  real(kind=c_double), intent(out) :: grads(3,natoms)
+
+  type(dftd3_calc) :: dftd3
+  type(dftd3_input) :: input
+  real(kind=c_double) :: coordsr(3,natoms)
+  integer(kind=c_int) :: i, nchars
+
+  do i = 1,natoms
+    coordsr(:,i) = coords(i,:)
+  end do 
+
+  ! Initialize dftd3
+  call dftd3_init(dftd3, input)
+
+  ! Set parameters
+  call dftd3_set_params(dftd3, params, version)
+
+  ! Calculate dispersion and gradients for non-periodic case
+  call dftd3_dispersion(dftd3, coordsr, itype, edisp, grads)
+
+end subroutine wrapper_params
